@@ -1,0 +1,27 @@
+---
+- hosts: cluster-dns
+  roles:
+    - pacemaker
+  vars:
+    pacemaker_ansible_group: HA
+    pacemaker_password: hacluster
+    pacemaker_cluster_name: hacluster
+    pacemaker_properties:
+      stonith_enabled: "false"
+    pacemaker_resources:
+      - id: ClusterIP
+        type: "ocf:heartbeat:IPaddr2"
+        options:
+          ip: 192.168.43.150
+          cidr_netmask: 24
+        op:
+          - action: monitor
+            options:
+              interval: 5s
+      - id: lb-nginx
+        type: "systemd:nginx"
+        op:
+          - action: monitor
+            options:
+              interval: 5s
+        clone: true
